@@ -61,11 +61,23 @@ tr:nth-child(even) {
       font-size: 1.4rem;
       padding: 10px;
     }
+    .player-item:before{
+      top: -17px;
+      width: 30px;
+      height: 30px;
+      margin-left: -15px;
+    }
   }
   @media all and (max-width:540px) {
     .formation-item{
       margin:5px;
       padding: 10px;
+    }
+    .player-item:before{
+      top: -14px;
+      width: 20px;
+      height: 20px;
+      margin-left: -10px;
     }
   }
   @media all and (max-width:440px) {
@@ -90,6 +102,21 @@ tr:nth-child(even) {
   }
   .player-item{
     background: #004080;
+    position: relative;
+    padding-left: 30px;
+    &:before{
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      margin-left: -20px;
+      content: "";
+      display: block;
+      background: url('./images/player-shirt.png');
+      background-repeat: no-repeat;
+      background-size: contain;
+      width:40px;
+      height: 40px;
+    }
   }
   .empty-item{
     background: #009100;
