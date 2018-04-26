@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import Pusher from 'pusher-js';
 import './App.css';
 import LineUp from './json/lineup.json';
 
@@ -8,7 +9,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      lineup: LineUp.lineups[1]
+      lineup: LineUp.lineups[0]
     }
     this.returnPlayerObj = this.returnPlayerObj.bind(this)
   }
@@ -21,6 +22,14 @@ class App extends Component {
           this.setState({lineup: LineUp.lineups[1]});
         }
     );
+    const pusher = new Pusher('6a3acdaba86ad858948b', {
+      cluster: 'eu',
+      encrypted: true
+    });
+    const channel = pusher.subscribe('lineups');
+    channel.bind('lineup-updated', data => {
+      this.setState({ lineup: data });
+    });
   }
   returnPlayerObj(formPlace, objProp) {
     let thisPlayer = this.state.lineup.players.filter((e, i) => {
