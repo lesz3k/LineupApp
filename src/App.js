@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import axios from 'axios';
 import Pusher from 'pusher-js';
 import './App.css';
@@ -9,9 +8,11 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      lineup: LineUp.lineups[0]
+      lineup: LineUp.lineups[0],
+      winWidth: 0
     }
     this.returnPlayerObj = this.returnPlayerObj.bind(this)
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
   componentDidMount() {
     axios.get('http://lineups.dev.fantech.io')
@@ -30,57 +31,77 @@ class App extends Component {
     channel.bind('lineup-updated', data => {
       this.setState({ lineup: data });
     });
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
   }
   returnPlayerObj(formPlace, objProp) {
     let thisPlayer = this.state.lineup.players.filter((e, i) => {
-      return e.formation_place==formPlace ? e : ''
+      return e.formation_place===formPlace ? e : ''
     })
     return thisPlayer[0]
   }
+  updateWindowDimensions() {
+    this.setState({ winWidth: window.innerWidth });
+  }
 
   render() {
-    let {lineup} = this.state
+    let {lineup, winWidth} = this.state
     return (
       <div className="App">
         <header className="App-header">
             <h1>Team lineup and formation</h1>
         </header>
-        <p className="App-intro">
-
-        </p>
-        <section>
-            <div className="lineup-container">
+        <main>
+            <section className="lineup-container">
                 <h2>Lineup for the {lineup.team} </h2>
                 <p>Formation: <b>{lineup.formation}</b> </p>
                 <p>Players: </p>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Name</th>
-                      <th>Formation place</th>
-                      <th>Type</th>
-                      <th>Position</th>
-                    </tr>
-                      {
-                        lineup.players.map((e, i) => {
-                          return(
-                            <tr key={i}>
-                              <td>{e.name}</td>
-                              <td>{e.formation_place}</td>
-                              <td>{e.type}</td>
-                              <td>{e.position}</td>
-                            </tr>
-                          )
-                        })
-                      }
-                  </tbody>
-                </table>
-            </div>
+                {
+                  (winWidth<340) ?
+                  <div className="lineup-mobile-container">
+                     <ul>
+                     {
+                       lineup.players.map((e, i) => {
+                         return(
+                           <li key={i}>
+                             {e.name}, {e.formation_place}, {e.type}, {e.position}
+                           </li>
+                         )
+                       })
+                     }
+                     </ul>
+                  </div>
+                  :
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Name</th>
+                        <th>Formation place</th>
+                        <th>Type</th>
+                        <th>Position</th>
+                      </tr>
+                        {
+                          lineup.players.map((e, i) => {
+                            return(
+                              <tr key={i}>
+                                <td>{e.name}</td>
+                                <td>{e.formation_place}</td>
+                                <td>{e.type}</td>
+                                <td>{e.position}</td>
+                              </tr>
+                            )
+                          })
+                        }
+                      </tbody>
+                  </table>
+                }
 
-            <div className="formation-container">
+            </section>
+
+            <section className="formation-container">
               <h2>Formation of {lineup.team} </h2>
 
-              <section id="formation-pitch" className={'formation-'+lineup.formation}>
+              <div id="formation-pitch" className={'formation-'+lineup.formation}>
 
                   <div className="formation-row">
                     <div className="formation-item empty-item"></div>
@@ -90,7 +111,7 @@ class App extends Component {
 
                   {
                     //row 2
-                    (lineup.formation==442 || lineup.formation==4411 ) ?
+                    (lineup.formation===442 || lineup.formation===4411 ) ?
                     <div className="formation-row">
                       <div className="formation-item player-item">{this.returnPlayerObj(2).name}, {this.returnPlayerObj(2).type}</div>
                       <div className="formation-item player-item">{this.returnPlayerObj(5).name}, {this.returnPlayerObj(5).type}</div>
@@ -110,7 +131,7 @@ class App extends Component {
 
                   {
                     //row 3
-                    (lineup.formation==442 || lineup.formation==4411 ) ?
+                    (lineup.formation===442 || lineup.formation===4411 ) ?
                     <div className="formation-row">
                       <div className="formation-item player-item">{this.returnPlayerObj(7).name}, {this.returnPlayerObj(7).type}</div>
                       <div className="formation-item player-item">{this.returnPlayerObj(4).name}, {this.returnPlayerObj(4).type}</div>
@@ -129,14 +150,14 @@ class App extends Component {
 
                   {
                     //row 4
-                    (lineup.formation==442) ?
+                    (lineup.formation===442) ?
                     <div className="formation-row">
                       <div className="formation-item empty-item"></div>
                       <div className="formation-item player-item">{this.returnPlayerObj(10).name}, {this.returnPlayerObj(10).type}</div>
                       <div className="formation-item player-item">{this.returnPlayerObj(9).name}, {this.returnPlayerObj(9).type}</div>
                       <div className="formation-item empty-item"></div>
                     </div>
-                      : (lineup.formation==4411) ?
+                      : (lineup.formation===4411) ?
                     <div className="formation-row">
                       <div className="formation-item empty-item"></div>
                       <div className="formation-item player-item">{this.returnPlayerObj(10).name}, {this.returnPlayerObj(10).type}</div>
@@ -154,7 +175,7 @@ class App extends Component {
 
                   {
                     //row 5
-                    (lineup.formation==3421 || lineup.formation==4411 ) ?
+                    (lineup.formation===3421 || lineup.formation===4411 ) ?
                     <div className="formation-row">
                       <div className="formation-item empty-item"></div>
                       <div className="formation-item player-item">{this.returnPlayerObj(9).name}, {this.returnPlayerObj(9).type}</div>
@@ -170,9 +191,9 @@ class App extends Component {
 
 
 
-              </section>
-            </div>
-        </section>
+              </div>
+            </section>
+        </main>
       </div>
     );
   }
